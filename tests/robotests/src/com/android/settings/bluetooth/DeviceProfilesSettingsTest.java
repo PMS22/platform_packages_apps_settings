@@ -19,9 +19,11 @@ package com.android.settings.bluetooth;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.EditText;
 
 import com.android.settings.SettingsRobolectricTestRunner;
 import com.android.settings.TestConfig;
@@ -91,6 +93,7 @@ public class DeviceProfilesSettingsTest {
         when(mManager.getProfileManager()).thenReturn(mProfileManager);
         when(mProfileManager.getMapProfile()).thenReturn(null);
         when(mDeviceManager.findDevice(any())).thenReturn(mCachedDevice);
+        when(mCachedDevice.getName()).thenReturn("Test");
     }
 
     @Test
@@ -201,6 +204,20 @@ public class DeviceProfilesSettingsTest {
         CheckBox box = (CheckBox) profilesGroup.findViewWithTag(
                 DeviceProfilesSettings.HIGH_QUALITY_AUDIO_PREF_TAG);
         assertThat(box).isNull();
+    }
+
+    @Test
+    public void cursorAtRightPlace() {
+        FragmentTestUtil.startFragment(mFragment);
+        View rootView = LayoutInflater.from(mContext).inflate(R.layout.device_profiles_settings, null);
+        EditText deviceName = (EditText) rootView.findViewById(R.id.name);
+        deviceName.setText(mCachedDevice.getName());
+        int textLength = deviceName.getText().length();
+        deviceName.setSelection(textLength);
+
+        // Test whether textLength is aligned properly for the given input using char 0
+        assertThat(textLength).isGreaterThan(0);
+        assertThat(deviceName.getSelectionEnd()).isEqualTo(textLength);
     }
 
 }
